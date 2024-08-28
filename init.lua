@@ -1,6 +1,6 @@
 --[[
 
-=====================================================================
+=====================================================================init
 ==================== READ THIS BEFORE CONTINUING ====================
 =====================================================================
 ========                                    .-----.          ========
@@ -838,8 +838,73 @@ require('lazy').setup({
     end,
   },
 
+  -- {
+  --   'chriskempson/base16-vim',
+  -- },
   {
-    'chriskempson/base16-vim',
+    'sainnhe/gruvbox-material',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- Optionally configure and load the colorscheme
+      -- directly inside the plugin declaration.
+      vim.g.gruvbox_material_enable_italic = false
+    end,
+  },
+
+  {
+    'tiagovla/tokyodark.nvim',
+    opts = {
+      -- custom options here
+    },
+    config = function(_, opts)
+      require('tokyodark').setup(opts) -- calling setup is optional
+    end,
+  },
+
+  {
+    'sainnhe/everforest',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- Optionally configure and load the colorscheme
+      -- directly inside the plugin declaration.
+      vim.g.everforest_enable_italic = true
+    end,
+  },
+
+  {
+    '0xstepit/flow.nvim',
+    lazy = false,
+    priority = 1000,
+    opts = {},
+  },
+
+  {
+    'navarasu/onedark.nvim',
+    init = function()
+      require('onedark').setup {
+        style = 'warmer',
+      }
+    end,
+  },
+
+  {
+    'rose-pine/neovim',
+    name = 'rose-pine',
+    init = function() end,
+  },
+
+  {
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000,
+    init = function()
+      require('catppuccin').setup {
+        flavour = 'mocha',
+      }
+      -- vim.cmd.colorscheme 'catppuccin'
+    end,
   },
 
   { -- You can easily change to a different colorscheme.
@@ -854,6 +919,18 @@ require('lazy').setup({
         styles = {
           keywords = { italic = false },
         },
+        on_colors = function(colors)
+          -- local bg = '#20212b'
+          local bg = '#212123'
+          local bg_dark = '#1f1f21'
+
+          colors.bg = bg
+          colors.bg_dark = bg_dark
+          colors.bg_float = bg_dark
+          colors.bg_popup = bg_dark
+          colors.bg_sidebar = bg_dark
+          colors.bg_statusline = bg_dark
+        end,
       }
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
