@@ -841,6 +841,11 @@ require('lazy').setup({
   -- {
   --   'chriskempson/base16-vim',
   -- },
+
+  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
+  { 'arturgoms/moonbow.nvim' },
+  { 'miikanissi/modus-themes.nvim', priority = 1000 },
+
   {
     'sainnhe/gruvbox-material',
     lazy = false,
@@ -921,7 +926,7 @@ require('lazy').setup({
         },
         on_colors = function(colors)
           -- local bg = '#20212b'
-          local bg = '#212123'
+          local bg = '#232325'
           local bg_dark = '#1f1f21'
 
           colors.bg = bg
@@ -935,13 +940,27 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-moon'
+      vim.cmd.colorscheme 'gruvbox-material'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
     end,
   },
 
+  -- Or with configuration
+  {
+    'projekt0n/github-nvim-theme',
+    name = 'github-theme',
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    priority = 1000, -- make sure to load this before all the other start plugins
+    config = function()
+      require('github-theme').setup {
+        -- ...
+      }
+
+      -- vim.cmd 'colorscheme github_dark'
+    end,
+  },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
