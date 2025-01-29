@@ -85,16 +85,28 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
 -- A TAB character looks like 4 spaces
-vim.o.tabstop = 4
+-- vim.o.tabstop = 4
 
 -- Pressing the TAB key will insert spaces instead of a TAB character
-vim.o.expandtab = true
+-- vim.o.expandtab = true
 
 -- Number of spaces inserted instead of a TAB character
-vim.o.softtabstop = 4
+-- vim.o.softtabstop = 4
 
 -- Number of spaces inserted when indenting
-vim.o.shiftwidth = 4
+-- vim.o.shiftwidth = 4
+
+-- Set Go indentation options using an autocommand
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'go',
+  callback = function()
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.tabstop = 4
+    vim.opt_local.expandtab = false
+  end,
+  group = vim.api.nvim_create_augroup('SetGoIndentation', { clear = true }),
+  desc = 'Set indentation options for Go files',
+})
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -158,7 +170,7 @@ vim.opt.splitbelow = true
 --  See `:help 'list'`
 --  and `:help 'listchars'`
 vim.opt.list = true
-vim.opt.listchars = { tab = '  ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = '▎ ' }
 
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = 'split'
@@ -259,11 +271,52 @@ require('lazy').setup({
     'lewis6991/gitsigns.nvim',
     opts = {
       signs = {
-        add = { text = '+' },
-        change = { text = '~' },
+        add = { text = '┃' },
+        change = { text = '┃' },
         delete = { text = '_' },
         topdelete = { text = '‾' },
         changedelete = { text = '~' },
+        untracked = { text = '┆' },
+      },
+      signs_staged = {
+        add = { text = '┃' },
+        change = { text = '┃' },
+        delete = { text = '_' },
+        topdelete = { text = '‾' },
+        changedelete = { text = '~' },
+        untracked = { text = '┆' },
+      },
+      signs_staged_enable = true,
+      signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
+      numhl = false, -- Toggle with `:Gitsigns toggle_numhl`
+      linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
+      word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
+      watch_gitdir = {
+        follow_files = true,
+      },
+      auto_attach = true,
+      attach_to_untracked = false,
+      current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+      current_line_blame_opts = {
+        virt_text = true,
+        virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+        delay = 1000,
+        ignore_whitespace = false,
+        virt_text_priority = 100,
+        use_focus = true,
+      },
+      current_line_blame_formatter = '<author>, <author_time:%R> - <summary>',
+      sign_priority = 6,
+      update_debounce = 100,
+      status_formatter = nil, -- Use default
+      max_file_length = 40000, -- Disable if file is longer than this (in lines)
+      preview_config = {
+        -- Options passed to nvim_open_win
+        border = 'single',
+        style = 'minimal',
+        relative = 'cursor',
+        row = 0,
+        col = 1,
       },
     },
   },
@@ -842,7 +895,7 @@ require('lazy').setup({
     'kevinhwang91/nvim-ufo',
     dependencies = { 'kevinhwang91/promise-async' },
     config = function()
-      vim.o.foldcolumn = '1' -- '0' is not bad
+      vim.o.foldcolumn = '0' -- '0' is not bad
       vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
       vim.o.foldlevelstart = 99
       vim.o.foldenable = true
@@ -871,13 +924,57 @@ require('lazy').setup({
     end,
   },
 
-  -- {
-  --   'chriskempson/base16-vim',
-  -- },
+  {
+    'ellisonleao/gruvbox.nvim',
+    priority = 1000,
+    config = true,
+    opts = ...,
+  },
 
-  { 'ellisonleao/gruvbox.nvim', priority = 1000, config = true, opts = ... },
-  { 'arturgoms/moonbow.nvim' },
-  { 'miikanissi/modus-themes.nvim', priority = 1000 },
+  { 'savq/melange-nvim' },
+
+  { 'rebelot/kanagawa.nvim' },
+
+  {
+    'bluz71/vim-moonfly-colors',
+    name = 'moonfly',
+    lazy = false,
+    priority = 1000,
+    config = function(self, opts)
+      vim.cmd.colorscheme 'moonfly'
+
+      -- remove ~ from the end of buffers
+      vim.opt.fillchars:append { eob = ' ' }
+    end,
+  },
+
+  {
+    'miikanissi/modus-themes.nvim',
+    priority = 1000,
+    init = function()
+      require('modus-themes').setup {
+        styles = {
+          keywords = { italic = false },
+        },
+        on_colors = function(colors) end,
+        on_highlights = function(highlight, colors)
+          highlight.NeoTreeNormal = { bg = '#990000', fg = '#f4f4f4' }
+        end,
+      }
+    end,
+    config = function()
+      -- remove background color from gitsigns
+      vim.cmd 'highlight GitSignsAdd guibg=none guifg=green'
+      vim.cmd 'highlight GitSignsChange guibg=none guifg=yellow'
+      vim.cmd 'highlight GitSignsDelete guibg=none guifg=red'
+
+      -- change line number background color to none
+      vim.cmd 'hi LineNr guibg=none'
+
+      -- remove ~ from the end of buffers
+      vim.opt.fillchars:append { eob = ' ' }
+    end,
+  },
 
   {
     'sainnhe/gruvbox-material',
@@ -940,9 +1037,20 @@ require('lazy').setup({
     init = function()
       require('catppuccin').setup {
         flavour = 'mocha',
+
+        -- cool dark version of catppuccin
+        -- color_overrides = {
+        --   mocha = {
+        --     base = '#000000',
+        --     mantle = '#000000',
+        --     crust = '#000000',
+        --   },
+        -- },
       }
-      -- vim.cmd.colorscheme 'catppuccin'
     end,
+    opts = {
+      no_italic = true,
+    },
   },
 
   { -- You can easily change to a different colorscheme.
@@ -958,22 +1066,21 @@ require('lazy').setup({
           keywords = { italic = false },
         },
         on_colors = function(colors)
-          -- local bg = '#20212b'
-          local bg = '#232325'
-          local bg_dark = '#1f1f21'
-
-          colors.bg = bg
-          colors.bg_dark = bg_dark
-          colors.bg_float = bg_dark
-          colors.bg_popup = bg_dark
-          colors.bg_sidebar = bg_dark
-          colors.bg_statusline = bg_dark
+          -- -- local bg = '#20212b'
+          -- local bg = '#232325'
+          -- local bg_dark = '#1f1f21'
+          --
+          -- colors.bg = bg
+          -- colors.bg_dark = bg_dark
+          -- colors.bg_float = bg_dark
+          -- colors.bg_popup = bg_dark
+          -- colors.bg_sidebar = bg_dark
+          -- colors.bg_statusline = bg_dark
         end,
       }
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'modus_vivendi'
 
       -- You can configure highlights by doing something like:
       vim.cmd.hi 'Comment gui=none'
@@ -1074,7 +1181,7 @@ require('lazy').setup({
   require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
